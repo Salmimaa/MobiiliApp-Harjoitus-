@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<!-- https://discgolfmetrix.com/api.php?content=course&id=12543 -->
+<html>
+<head>
+   <meta charset="utf-8" />
+	<meta name="format-detection" content="telephone=no" />
+	<meta name="msapplication-tap-highlight" content="no" />
+	<meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width" />
+	<meta http-equiv="Content-Security-Policy: default-src 'self' 'unsafe-inline' 'unsafe-eval'
+ws://10.213.249.132:3000/
+http://proto387.haaga-helia.fi http://code.jquery.com https://code.jquery.com https://csi.gstatic.com https://ssl.gstatic.com
+https://mts.googleapis.com https://maps.googleapis.com https://maps.gstatic.com;
+style-src 'self' http://code.jquery.com/mobile/ https://fonts.googleapis.com;
+font-src 'self' https://fonts.gstatic.com
+gap: data: blob: filesystem: ;"
+/>
+			
+	<link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css">
+	<script src="https://code.jquery.com/jquery-2.1.4.js" integrity="sha256-siFczlgw4jULnUICcdm9gjQPZkw/YPDqhQ9+nAOScE4="	crossorigin="anonymous"></script>
+	<script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+   <link rel="stylesheet" type="text/css" href="css/index.css">	
+	<title>FGSuomi</title>
+</head>
+<body>
+	<!--login -->
+	<div data-role="page" id="login">
+		<div data-role="header">			
+		</div>         
+		<div role="main" class="ui-content ui-body-a">
+			<h1>Kirjaudu</h1>
+			<form id="loginLomake">
+			<label for="kayttaja">Käyttäjä:</label>
+			<input type="text" name="kayttaja" id="kayttaja">
+			<label for="pwd">Salasana:</label>
+			<input type="password" name="pwd" id="pwd">
+			<button class="ui-btn" id="kirjaudu">Kirjaudu</button>
+			</form>
+			<button class="ui-btn" id="rekisteroidy">Rekisteröidy</button>
+		</div>
+		<div data-role="footer">
+		</div>
+	</div>
+	<!--rekisteröityminen -->
+	<div data-role="page" id="register">
+		<div data-role="header">			
+		</div>         
+		<div role="main" class="ui-content ui-body-a">
+			<h1>Rekisteröidy</h1>
+			<form id="registerLomake">
+			<label for="kayttaja1">Käyttäjä:</label>
+			<input type="text" name="kayttaja1" id="kayttaja1">
+			<label for="nimi">Nimi:</label>
+			<input type="text" name="nimi" id="nimi">
+			<label for="pwd1">Salasana:</label>
+			<input type="password" name="pwd1" id="pwd1">
+			<button class="ui-btn" id="register1">Rekisteröidy</button>
+			</form>
+		</div>
+		<div data-role="footer">
+		</div>
+	</div>
+	<!--Etusivu -->
+	<div data-role="page" id="etusivu">
+		<div data-role="header">			
+			<h1 id="kirjautuneena"></h1>
+		</div>         
+		<div role="main" class="ui-content ui-body-a"> 	
+			<div id="mapKartta" style="height:600px"></div> 
+			<button class="ui-btn" id="tulokset">Tulokset</button>
+			<button class="ui-btn" id="ulos">Kirjaudu ulos</button>
+			<button class="ui-btn" id="poista">Poista Käyttäjä</button>
+		</div>
+		<div data-role="footer">
+
+		</div>
+	</div>
+<!--Tulokset -->
+<div data-role="page" id="tulokset1">
+	<div data-role="header">			
+		<h1 id="kirjautuneena"></h1>
+	</div>         
+	<div role="main" class="ui-content ui-body-a">
+		<table id="tulosTaulu" class="table-default">
+					<thead>
+						<tr>
+							<th>Rata:</th>
+							<th>Par:</th>
+							<th>Oma tulos:</th>	
+							<th>Erotus:</th>							
+						</tr>
+					</thead>
+					<tbody>					
+					</tbody>
+				</table>	
+		<button class="ui-btn" id="kartta">Kartta</button>
+	</div>
+	<div data-role="footer">
+
+	</div>
+</div>
+<!--Täytä Rata -->
+<div data-role="page" id="taytaRata">
+	<div data-role="header">			
+		<h1 id="RataNimi"></h1>
+		<h1 id="RataID"></h1>
+	</div>        
+	<div role="main" class="ui-content ui-body-a">
+			<h1 id="eiRatoja"></h1>
+			<div id="naytaTiedot">
+				<form id="heittoLomake">
+				<table id="tiedotTaulu" class="table-default">
+					<thead>
+						<tr>
+							<th>Väylä:</th>
+							<th>Par:</th>
+							<th>Heitto:</th>							
+						</tr>
+					</thead>
+					<tbody>					
+					</tbody>
+				</table>
+				<button class="ui-btn" id="tallenna1">Tallenna</button>
+				</form>
+			</div>
+		<button class="ui-btn" id="kartta1">Kartta</button>
+		
+	</div>
+	<div data-role="footer">
+
+	</div>
+</div>
+<script type="text/javascript" src="cordova.js"></script>
+	<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBqJVIrrOyq3_xGAvvVjUKcNEakVO3vc7A&libraries=geometry"></script>
+	<script>	
+	
+		$(document).on("pagecontainershow", function( event, ui ) {	
+			var toPage = ui.toPage[0].id; 
+			if(toPage=="etusivu"){
+				if(sessionStorage.name==undefined){
+					document.location="#login";
+				}
+				$("#kirjautuneena").html(sessionStorage.name);	
+			}			
+		});	
+//<!-- ----------------------------------------------------------------------------------------------------------->
+		$("#kirjaudu").on("tap", function(){
+			if($("#kayttaja").val().length>0&&$("#pwd").val().length>0){				
+				$.ajax({
+					type: 'POST',
+					data: $("#loginLomake").serialize(),
+					url: 'http://proto387.haaga-helia.fi/~a1800573/BackEnd/Harjoitustyo/selectLogin.php',
+					success: function(data){	
+						var tiedot = JSON.parse(data);					
+						if(tiedot.length>0){
+							sessionStorage.name=tiedot[0].Nimi;							
+							document.location="#etusivu";
+							
+						}else{
+							console.log("Käyttäjää ei tunnisteta.")
+							document.location="#login";
+						}						
+					},
+					error: function(){	
+						console.log(2);											
+					}
+				});				
+			}
+				$("#kayttaja").val("");
+				$("#pwd").val("");
+			});
+//<!-- ----------------------------------------------------------------------------------------------------------->	
+		$("#poista").on("tap", function(){
+				$.ajax({url: "http://proto387.haaga-helia.fi/~a1800573/BackEnd/Harjoitustyo/delete.php?nimi="+sessionStorage.name, success: function(){
+					document.location="#login";
+				}});
+		});
+//<!--Navigaatio ----------------------------------------------------------------------------------------------------------->	
+		$("#rekisteroidy").on("tap", function(){
+			document.location="#register";
+		});
+
+
+		$("#kartta").on("tap", function(){
+			document.location="#etusivu";
+		});
+
+		$("#kartta1").on("tap", function(){
+			document.location="#etusivu";
+			$("#eiRatoja").html("");
+			$("#tiedotTaulu tbody").html("");
+			$("#tulosTaulu tbody").html("");
+			$("#RataNimi").html("");
+			$("#RataID").html("");
+
+		});
+			$("#kartta").on("tap", function(){
+			document.location="#etusivu";
+			$("#eiRatoja").html("");
+			$("#tiedotTaulu tbody").html("");
+			$("#tulosTaulu tbody").html("");
+			$("#RataNimi").html("");
+			$("#RataID").html("");
+
+		});
+//<!-- ----------------------------------------------------------------------------------------------------------->		
+		$("#register1").on("tap", function(){
+			if($("#kayttaja1").val().length>0&&$("#pwd1").val().length>0&&$("#nimi").val().length>0){
+				$.ajax({
+					type: 'POST',
+					data: $("#registerLomake").serialize(),
+					url: 'http://proto387.haaga-helia.fi/~a1800573/BackEnd/Harjoitustyo/insert.php',
+					success: function(data){
+					document.location="#etusivu";
+				},
+				});				
+				}	
+			$("#kayttaja1").val("");
+			$("#pwd1").val("");
+			$("#nimi").val("");
+		});
+//<!-- ----------------------------------------------------------------------------------------------------------->		
+		$("#ulos").on("tap", function(){
+				sessionStorage.clear();
+				document.location="#login";
+		});
+//<!-- ----------------------------------------------------------------------------------------------------------->		
+		var laiteKesken = $.Deferred(); 
+		var karttaSivuKesken = $.Deferred();
+		
+		$(document).on("pagecontainershow", function( event, ui ) {	
+			var toPage = ui.toPage[0].id; 
+			if(toPage=="etusivu"){
+				karttaSivuKesken.resolve();	
+			}
+		});	
+//<!-- ----------------------------------------------------------------------------------------------------------->		
+		document.addEventListener("deviceReady", onDeviceReady, false);
+		function onDeviceReady() {			
+			laiteKesken.resolve();		
+		}	
+//<!-- ----------------------------------------------------------------------------------------------------------->		
+		$.when(laiteKesken, karttaSivuKesken).done(karttaSivuValmis);
+//<!-- ----------------------------------------------------------------------------------------------------------->		
+		function karttaSivuValmis() {
+			navigator.geolocation.getCurrentPosition(onLocationSuccess, onLocationError, { timeout: 20000 });
+			function onLocationSuccess(position) {						
+				teeMap(position.coords.latitude, position.coords.longitude);					
+			}
+			function onLocationError() {				
+				console.log("Paikannus ei onnistu");
+			}
+		}
+//<!-- ----------------------------------------------------------------------------------------------------------->		
+		function teeMap(lat, lon) {				
+			var paikka = new google.maps.LatLng(lat, lon);			
+			var myOptions = {
+				zoom:11,
+				center: paikka
+			};
+
+			var kartta = new google.maps.Map(document.getElementById("mapKartta"), myOptions);
+			var marker = new google.maps.Marker({
+				position: paikka,
+				map: kartta,
+				title: "Olet tässä"
+			})
+//<!-- https://discgolfmetrix.com/api.php?content=courses_list&country_code=FI ----------------------------------------------------------------------------------------------------------->			
+				$.ajax({
+					type: 'POST',
+					url: 'https://discgolfmetrix.com/api.php?content=courses_list&country_code=FI',
+					dataType: "json",
+					success: function(data){
+						var locations=[];
+						if(data){
+							for(var i = 0; i < data.courses.length; i++){
+								if(data.courses[i].X != "" && data.courses[i].Y != ""){
+								var paikka={
+								"latlng" :[{"lat": parseFloat(data.courses[i].X), "lng": parseFloat(data.courses[i].Y)}],
+								"ID": parseFloat(data.courses[i].ID),
+								"NAME": data.courses[i].Fullname,
+								};						
+								locations.push(paikka);
+								}
+							}
+						for (var i = 0; i < locations.length; i++) {
+                        	var contentString = '<p>' + locations[i].NAME +'</p><button onClick="haeVaylat('+locations[i].ID+')">Pelaa</button>';
+							
+                        const marker = new google.maps.Marker({
+                            position: locations[i].latlng[0],
+                            map: kartta,
+							icon: {
+      							url: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png"
+    					}
+                        });
+        
+                        const infowindow = new google.maps.InfoWindow({
+                            content: contentString,
+                            maxWidth: 200
+                        });
+        
+                        marker.addListener('click', function () {
+                            infowindow.open(marker.get('map'), marker);
+                        });
+                    }
+						}else{
+							console.log("ei toimi");
+						}
+					},
+					error: function(){	
+						console.log(2);											
+					}
+				});	
+		
+	}
+
+
+//<!--Hae Ratatiedot ----------------------------------------------------------------------------------------------------------->
+
+		function haeVaylat(id){
+			document.location="#taytaRata";
+			var vaylat=[];
+			$.ajax({
+					type: 'POST',
+					url: 'https://discgolfmetrix.com/api.php?content=course&id='+id,
+					dataType: "json",
+					success: function(data){
+						$("#RataNimi").html(data.course.Fullname);
+						$("#RataID").html(data.course.ID);
+						if(Object.keys( data ).length==3 ){
+							for(var i = 0; i < data.baskets.length; i++){
+								var vayla = {
+									"nimi" : data.course.Fullname,
+									"id" : data.course.ID,		
+									"numero" : data.baskets[i].Number,
+									"par" : data.baskets[i].Par 
+								};
+								vaylat.push(vayla);
+								$("#tiedotTaulu tbody").append("<tr><td>"+vayla.numero+"</td><td>"+vayla.par+"</td><td><input type=text id="+"vayla"+vayla.numero+" name="+"vayla"+vayla.numero+"></td></tr>");	
+							}
+						}else{
+							console.log("ei ratatietoja");
+							$("#eiRatoja").html("Radalle ei löytynyt väylä tietoja");
+						}
+						var vaylat1 = JSON.stringify(vaylat);
+						
+						$.ajax({
+							type: 'POST',
+							data: {myArray: vaylat1},
+							url: 'http://proto387.haaga-helia.fi/~a1800573/BackEnd/Harjoitustyo/tallenna.php',
+							success: function(data1){
+								
+								
+						},
+						});
+					}
+					
+			});
+			
+		}
+//<!-- ----------------------------------------------------------------------------------------------------------->	
+$("#tallenna1").on("tap", function(){
+				var mystring = JSON.stringify($("#heittoLomake").serializeArray());
+				var id = $("#RataID").html()
+				var pelaaja = $("#kirjautuneena").html()
+				$.ajax({
+					type: 'POST',
+					data: {heitto: mystring, id: id, pelaaja: pelaaja},
+					url: 'http://proto387.haaga-helia.fi/~a1800573/BackEnd/Harjoitustyo/tulos.php',
+					success: function(data){
+						$("#tiedotTaulu tbody").html("");		
+						document.location="#etusivu";
+				},
+				});					
+			
+	});
+
+		$("#tulokset").on("tap", function(){
+			var pelaaja = $("#kirjautuneena").html()
+			$.ajax({
+				type: 'POST',
+				data: {pelaaja: pelaaja},
+				url: 'http://proto387.haaga-helia.fi/~a1800573/BackEnd/Harjoitustyo/tulokset.php',
+					success: function(data){
+						var tulos = JSON.parse(data);
+						for(var i = 0; i < tulos.length; i++){
+							var ero = tulos[i].lkm - tulos[i].sum;
+							$("#tulosTaulu tbody").append("<tr><td>"+tulos[i].ratanimi+"</td><td>"+tulos[i].sum+"</td><td>"+tulos[i].lkm+"</td><td>"+ero+"</td></tr>");
+						}
+						
+						
+				},
+			});
+
+
+			document.location="#tulokset1";
+		});
+</script>
+</body>
+</html>
